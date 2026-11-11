@@ -1,14 +1,14 @@
 // tessellation shader.cpp
-#include "tessellationshader.h"
+#include "tessellationquadshader.h"
 
 
-TessellationShader::TessellationShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
+TessellationQuadShader::TessellationQuadShader(ID3D11Device* device, HWND hwnd) : BaseShader(device, hwnd)
 {
-	initShader(L"tessellation_vs.cso", L"tessellation_hs.cso", L"tessellation_ds.cso", L"tessellation_ps.cso");
+	initShader(L"tessellation_vs.cso", L"tessellationquad_hs.cso", L"tessellation_ds.cso", L"tessellation_ps.cso");
 }
 
 
-TessellationShader::~TessellationShader()
+TessellationQuadShader::~TessellationQuadShader()
 {
 	if (sampleState)
 	{
@@ -35,7 +35,7 @@ TessellationShader::~TessellationShader()
 	BaseShader::~BaseShader();
 }
 
-void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
+void TessellationQuadShader::initShader(const wchar_t* vsFilename, const wchar_t* psFilename)
 {
 	
 
@@ -64,7 +64,7 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* ps
 	
 }
 
-void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* hsFilename, const wchar_t* dsFilename, const wchar_t* psFilename)
+void TessellationQuadShader::initShader(const wchar_t* vsFilename, const wchar_t* hsFilename, const wchar_t* dsFilename, const wchar_t* psFilename)
 {
 	// InitShader must be overwritten and it will load both vertex and pixel shaders + setup buffers
 	initShader(vsFilename, psFilename);
@@ -75,7 +75,7 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* hs
 }
 
 
-void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, const XMFLOAT4* hullInfo)
+void TessellationQuadShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, const XMFLOAT4* edgeInfo, const XMFLOAT2* insideInfo)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -96,10 +96,12 @@ void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext,
 
 	result = deviceContext->Map(hullBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	HullBufferType* hullPtr = (HullBufferType*)mappedResource.pData;
-	hullPtr->edgeA = hullInfo->x;
-	hullPtr->edgeB = hullInfo->y;
-	hullPtr->edgeC = hullInfo->z;
-	hullPtr->inside = hullInfo->w;
+	hullPtr->edges.x = edgeInfo->x;
+	hullPtr->edges.y = edgeInfo->y;
+	hullPtr->edges.z = edgeInfo->z;
+	hullPtr->edges.w = edgeInfo->w;
+	hullPtr->inside.x = insideInfo->x;
+	hullPtr->inside.y = insideInfo->y;
 	deviceContext->Unmap(hullBuffer, 0);
 	deviceContext->HSSetConstantBuffers(0, 1, &hullBuffer);
 }

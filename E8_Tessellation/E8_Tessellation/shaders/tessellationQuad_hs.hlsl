@@ -8,8 +8,8 @@ struct InputType
 
 struct ConstantOutputType
 {
-    float edges[3] : SV_TessFactor;
-    float inside : SV_InsideTessFactor;
+    float edges[4] : SV_TessFactor;
+    float inside[2] : SV_InsideTessFactor;
 };
 
 struct OutputType
@@ -20,10 +20,9 @@ struct OutputType
 
 cbuffer HullBuffer : register(b0)
 {
-    float edgeA;
-    float edgeB;
-    float edgeC;
-    float inside;
+    float4 edges;
+    float2 inside;
+    float2 buffer;
 };
 
 ConstantOutputType PatchConstantFunction(InputPatch<InputType, 3> inputPatch, uint patchId : SV_PrimitiveID)
@@ -32,21 +31,23 @@ ConstantOutputType PatchConstantFunction(InputPatch<InputType, 3> inputPatch, ui
 
 
     // Set the tessellation factors for the three edges of the triangle.
-	output.edges[0] = edgeA;
-	output.edges[1] = edgeB;
-	output.edges[2] = edgeC;
+	output.edges[0] = edges[0];
+	output.edges[1] = edges[1];
+	output.edges[2] = edges[2];
+    output.edges[3] = edges[3];
 
     // Set the tessellation factor for tessallating inside the triangle.
-	output.inside = inside;
+	output.inside[0] = inside[0];
+    output.inside[1] = inside[1];
 
     return output;
 }
 
 
-[domain("tri")]
+[domain("quad")]
 [partitioning("fractional_even")]
 [outputtopology("triangle_ccw")]
-[outputcontrolpoints(3)]
+[outputcontrolpoints(4)]
 [patchconstantfunc("PatchConstantFunction")]
 OutputType main(InputPatch<InputType, 3> patch, uint pointId : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
 {

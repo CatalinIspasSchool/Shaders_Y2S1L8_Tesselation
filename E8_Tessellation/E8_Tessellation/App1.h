@@ -5,6 +5,7 @@
 // Includes
 #include "DXF.h"	// include dxframework
 #include "TessellationShader.h"
+#include "TessellationQuadShader.h"
 
 class App1 : public BaseApplication
 {
@@ -23,8 +24,9 @@ protected:
 private:
 	TessellationMesh* mesh;
 	TessellationShader* shader;
-	XMFLOAT4* hullInfo;
-	float insideV;
+	TessellationQuadShader* quadShader;
+	XMFLOAT4* edgeInfo;
+	XMFLOAT2* insideInfo;
 	bool quadTrigger;
 };
 

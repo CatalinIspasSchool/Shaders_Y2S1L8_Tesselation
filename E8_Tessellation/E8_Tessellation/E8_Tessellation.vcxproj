@@ -165,10 +165,12 @@
   <ItemGroup>
     <ClCompile Include="App1.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="TessellationQuadShader.cpp" />
     <ClCompile Include="TessellationShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App1.h" />
+    <ClInclude Include="TessellationQuadShader.h" />
     <ClInclude Include="TessellationShader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +179,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="shaders\tessellationQuad_ds.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Domain</ShaderType>
+    </FxCompile>
+    <FxCompile Include="shaders\tessellationQuad_hs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Hull</ShaderType>
+    </FxCompile>
     <FxCompile Include="shaders\tessellation_ds.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Domain</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Domain</ShaderType>

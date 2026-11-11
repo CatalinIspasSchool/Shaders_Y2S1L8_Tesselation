@@ -8,24 +8,23 @@ using namespace std;
 using namespace DirectX;
 
 
-class TessellationShader : public BaseShader
+class TessellationQuadShader : public BaseShader
 {
 private:
 	struct HullBufferType
 	{
-		float edgeA;
-		float edgeB;
-		float edgeC;
-		float inside;
+		XMFLOAT4 edges;
+		XMFLOAT2 inside;
+		XMFLOAT2 padding;
 	};
 
 
 public:
 
-	TessellationShader(ID3D11Device* device, HWND hwnd);
-	~TessellationShader();
+	TessellationQuadShader(ID3D11Device* device, HWND hwnd);
+	~TessellationQuadShader();
 
-	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, const XMFLOAT4* hullInfo);
+	void setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, const XMFLOAT4* edgeInfo, const XMFLOAT2* insideInfo);
 
 private:
 	void initShader(const wchar_t* vsFilename, const wchar_t* psFilename);
