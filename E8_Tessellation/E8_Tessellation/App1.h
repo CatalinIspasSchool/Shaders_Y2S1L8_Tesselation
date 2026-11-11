@@ -23,6 +23,9 @@ protected:
 private:
 	TessellationMesh* mesh;
 	TessellationShader* shader;
+	XMFLOAT4* hullInfo;
+	float insideV;
+	bool quadTrigger;
 };
 
 #endif

@@ -23,7 +23,7 @@ OutputType main(InputType input)
     output.position = input.position;
     
     // Pass the input color into the hull shader.
-    output.colour = float4(1.0, 0.0, 0.0, 1.0);
+    output.colour = float4(1.0, 1.0, 0.0, 1.0);
     
     return output;
 }

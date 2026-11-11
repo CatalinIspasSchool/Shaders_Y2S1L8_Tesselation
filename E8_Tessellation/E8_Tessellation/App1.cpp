@@ -15,6 +15,10 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	// Create Mesh object and shader object
 	mesh = new TessellationMesh(renderer->getDevice(), renderer->getDeviceContext());
 	shader = new TessellationShader(renderer->getDevice(), hwnd);
+
+	hullInfo = new XMFLOAT4(4, 4, 4, 3);
+	insideV = 3;
+	quadTrigger = false;
 }
 
 
@@ -65,7 +69,7 @@ bool App1::render()
 
 	// Send geometry data, set shader parameters, render object with shader
 	mesh->sendData(renderer->getDeviceContext());
-	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix);
+	shader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, hullInfo);
 	shader->render(renderer->getDeviceContext(), mesh->getIndexCount());
 
 	// Render GUI
@@ -87,6 +91,13 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+	ImGui::Checkbox("Quad", &quadTrigger);
+
+	ImGui::DragFloat("Side A", &hullInfo->x, 0.1, 1, 64);
+	ImGui::DragFloat("Side B", &hullInfo->y, 0.1, 1, 64);
+	ImGui::DragFloat("Side C", &hullInfo->z, 0.1, 1, 64);
+	ImGui::DragFloat("Inside U", &hullInfo->w, 0.1, 1, 64);
+	ImGui::DragFloat("Inside V", &insideV, 0.1, 1, 64);
 
 	// Render UI
 	ImGui::Render();

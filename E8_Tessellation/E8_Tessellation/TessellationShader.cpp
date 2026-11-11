@@ -20,6 +20,11 @@ TessellationShader::~TessellationShader()
 		matrixBuffer->Release();
 		matrixBuffer = 0;
 	}
+	if (hullBuffer)
+	{
+		hullBuffer->Release();
+		hullBuffer = 0;
+	}
 	if (layout)
 	{
 		layout->Release();
@@ -46,9 +51,16 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* ps
 	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
-
 	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
 
+	D3D11_BUFFER_DESC hullBufferDesc;
+	hullBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	hullBufferDesc.ByteWidth = sizeof(HullBufferType);
+	hullBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	hullBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	hullBufferDesc.MiscFlags = 0;
+	hullBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&hullBufferDesc, NULL, &hullBuffer);
 	
 }
 
@@ -63,7 +75,7 @@ void TessellationShader::initShader(const wchar_t* vsFilename, const wchar_t* hs
 }
 
 
-void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix)
+void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &worldMatrix, const XMMATRIX &viewMatrix, const XMMATRIX &projectionMatrix, const XMFLOAT4* hullInfo)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -81,6 +93,15 @@ void TessellationShader::setShaderParameters(ID3D11DeviceContext* deviceContext,
 	dataPtr->projection = tproj;
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->DSSetConstantBuffers(0, 1, &matrixBuffer);
+
+	result = deviceContext->Map(hullBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	HullBufferType* hullPtr = (HullBufferType*)mappedResource.pData;
+	hullPtr->edgeA = hullInfo->x;
+	hullPtr->edgeB = hullInfo->y;
+	hullPtr->edgeC = hullInfo->z;
+	hullPtr->inside = hullInfo->w;
+	deviceContext->Unmap(hullBuffer, 0);
+	deviceContext->HSSetConstantBuffers(0, 1, &hullBuffer);
 }
 
 
